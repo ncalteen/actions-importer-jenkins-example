@@ -6,6 +6,10 @@ server.
 
 ## Step 1: Perform a Forecast
 
+> **Note:** This command requires the
+> [`paginated-builds`](https://plugins.jenkins.io/paginated-builds/) plugin on
+> your Jenkins server.
+
 When running a forecast, the following inputs must be provided:
 
 | Option         | Description                        | Example        |
