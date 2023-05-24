@@ -12,7 +12,7 @@ if [ "$(docker ps -a | grep jenkins:$container_name)" ]; then
 else
   echo -e "\nStarting a new Jenkins container"
   # Build jenkins image from docker compose file 
-  docker build -t jenkins:$container_name -f $CODESPACE_VSCODE_FOLDER/jenkins/bootstrap/Dockerfile .
+  docker build -t jenkins:$container_name -f ./bootstrap/Dockerfile .
 
   # Build container
   docker run -d --name jenkins -p 8080:8080 --env JENKINS_ADMIN_ID=$username --env JENKINS_ADMIN_PASSWORD=$password jenkins:$container_name
@@ -25,5 +25,6 @@ while ! curl -s http://localhost:8080/ > /dev/null; do
 done
 
 echo -e '\nJenkins is up and running!'
+echo -e '\nURL: http://localhost:8080'
 echo -e "\nUsername: admin"
 echo -e "\bPassword: password"
