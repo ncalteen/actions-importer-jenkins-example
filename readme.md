@@ -1,4 +1,4 @@
-# Jenkins Migrations Powered by GitHub Actions Importer (GAI)
+# Migrating from Jenkins using GitHub Actions Importer (GAI)
 
 These instructions will guide you through configuring a GitHub Codespaces
 environment that you will use in subsequent labs to learn how to use GitHub
