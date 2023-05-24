@@ -1,134 +1,128 @@
-# Perform a dry-run migration of a Jenkins pipeline
+# Perform a Dry-Run Migration of a Jenkins Pipeline
 
-In this lab you will use the `dry-run` command to convert a Jenkins pipeline to its equivalent GitHub Actions workflow.
+In this lab you will use the `dry-run` command to convert a Jenkins pipeline to
+its equivalent GitHub Actions workflow.
 
-## Prerequisites
+## Step 1: Perform a Dry Run
 
-1. Followed the steps [here](./readme.md#configure-your-codespace) to set up your GitHub Codespaces environment and start a Jenkins server.
-2. Completed the [configure lab](./1-configure.md#configuring-credentials).
-3. Completed the [audit lab](./2-audit.md).
+When running a dry-run, the following inputs must be provided:
 
-## Perform a dry run
+| Option         | Description                        | Example                                   |
+| -------------- | ---------------------------------- | ----------------------------------------- |
+| `--output-dir` | Output path for logs and artifacts | `tmp/dry-run`                             |
+| `--source-url` | URL to the source Jenkins pipeline | `http://localhost:8080/job/test_pipeline` |
 
-You will be performing a dry run against a pipeline in your preconfigured Jenkins server. Answer the following questions before running this command:
+1. Open a new terminal window
+2. Run the following command
 
-1. What is the name of the pipeline you want to convert?
-    - __test_pipeline__
+   ```bash
+   gh actions-importer dry-run jenkins --source-url http://localhost:8080/job/test_pipeline --output-dir tmp/dry-run
+   ```
 
-2. What is the URL of the pipeline you want to convert?
-    - __<http://localhost:8080/job/test_pipeline>__
+The command will list all the files written to disk when the command succeeds.
 
-3. Where do you want to store the result?
-    - __tmp/dry-run__. This can be any path within the working directory from which GitHub Actions Importer commands are executed.
+```bash
+$ gh actions-importer dry-run jenkins --source-url http://localhost:8080/job/test_pipeline --output-dir tmp/dry-run
+[2022-09-28 20:12:00] Logs: 'tmp/dry-run/log/actions-importer-20220928-201200.log'
+[2022-09-28 20:12:00] Output file(s):
+[2022-09-28 20:12:00]   tmp/dry-run/test_pipeline/.github/workflows/test_pipeline.yml
+```
 
-### Steps
+## Step 2: Inspect the Output Files
 
-1. Navigate to your codespace terminal.
-2. Run the following command from the root directory:
+The files generated from the `dry-run` command represent the equivalent Actions
+workflow for the given Jenkins pipeline. For example, the following code blocks
+show the initial Jenkins pipeline and the converted GitHub Actions workflow.
 
-    ```bash
-    gh actions-importer dry-run jenkins --source-url http://localhost:8080/job/test_pipeline --output-dir tmp/dry-run
-    ```
-
-3. The command will list all the files written to disk when the command succeeds.
-
-    ```console
-    $ gh actions-importer dry-run jenkins --source-url http://localhost:8080/job/test_pipeline --output-dir tmp/dry-run
-    [2022-09-28 20:12:00] Logs: 'tmp/dry-run/log/actions-importer-20220928-201200.log'
-    [2022-09-28 20:12:00] Output file(s):
-    [2022-09-28 20:12:00]   tmp/dry-run/test_pipeline/.github/workflows/test_pipeline.yml
-    ```
-
-4. View the converted workflow:
-    - Find `tmp/dry-run/test_pipeline/.github/workflows` in the file explorer pane in your codespace.
-    - Click `test_pipeline.yml` to open.
-
-## Inspect the output files
-
-The files generated from the `dry-run` command represent the equivalent Actions workflow for the given Jenkins pipeline. The Jenkins pipeline and converted workflow can be seen below:
-
-<details>
-  <summary><em>Jenkins pipeline 👇</em></summary>
+### Jenkins Pipeline
 
 ```groovy
 pipeline {
-    agent {
-        label 'TeamARunner'
-    }
+  agent {
+    label 'TeamARunner'
+  }
 
-    environment {
-        DISABLE_AUTH = 'true'
-        DB_ENGINE    = 'sqlite'
-    }
+  environment {
+    DISABLE_AUTH = 'true'
+    DB_ENGINE    = 'sqlite'
+  }
 
-    stages {
-        stage('build') {
-            steps {
-                echo "Database engine is ${DB_ENGINE}"
-                sleep 80
-                echo "DISABLE_AUTH is ${DISABLE_AUTH}"
-            }
-        }
-        stage('test') {
-            steps{
-                junit '**/target/*.xml'
-            }
-        }
+  stages {
+    stage('build') {
+      steps {
+        echo "Database engine is ${DB_ENGINE}"
+        sleep 80
+        echo "DISABLE_AUTH is ${DISABLE_AUTH}"
+      }
     }
+    stage('test') {
+      steps{
+        junit '**/target/*.xml'
+      }
+    }
+  }
 }
 ```
 
-</details>
-
-<details>
-  <summary><em>Converted workflow 👇</em></summary>
+### GitHub Actions Workflow
 
 ```yaml
 name: test_pipeline
+
 on:
   push:
-    paths: "*"
+    paths: '*'
   schedule:
-  - cron: 0-29/10 * * * *
+    - cron: 0-29/10 * * * *
+
 env:
   DISABLE_AUTH: 'true'
   DB_ENGINE: sqlite
+
 jobs:
   build:
     runs-on:
       - self-hosted
       - TeamARunner
+
     steps:
-    - name: checkout
-      uses: actions/checkout@v2
-    - name: echo message
-      run: echo "Database engine is ${{ env.DB_ENGINE }}"
-#     # This item has no matching transformer
-#     - sleep:
-#       - key: time
-#         value:
-#           isLiteral: true
-#           value: 80
-    - name: echo message
-      run: echo "DISABLE_AUTH is ${{ env.DISABLE_AUTH }}"
+      - name: checkout
+        uses: actions/checkout@v3.5.0
+
+      - name: echo message
+        run: echo "Database engine is ${{ env.DB_ENGINE }}"
+      #     # This item has no matching transformer
+      #     - sleep:
+      #       - key: time
+      #         value:
+      #           isLiteral: true
+      #           value: 80
+
+      - name: echo message
+        run: echo "DISABLE_AUTH is ${{ env.DISABLE_AUTH }}"
   test:
     runs-on:
       - self-hosted
       - TeamARunner
     needs: build
+
     steps:
-    - name: checkout
-      uses: actions/checkout@v2
-    - name: Publish test results
-      uses: EnricoMi/publish-unit-test-result-action@v1.7
-      if: always()
-      with:
-        files: "**/target/*.xml"
+      - name: checkout
+        uses: actions/checkout@v3.5.0
+
+      - name: Publish test results
+        uses: EnricoMi/publish-unit-test-result-action@v2.7.0
+        if: always()
+        with:
+          junit_files: '**/target/*.xml'
 ```
 
-</details>
+### Summary
 
-These two pipelines function equivalently despite using different syntax. In this case, the pipeline conversion was “partially successful” (that is, some item[s] were not automatically converted) and the unconverted item was placed as comment in the location the Jenkins pipeline used it. For example:
+These two pipelines function equivalently despite using different syntax. In
+this case, the pipeline conversion was “partially successful” (that is, some
+items were not automatically converted) and the unconverted item was placed as
+comment in the location the Jenkins pipeline used it.
 
 ```diff
 - sleep 80
@@ -140,10 +134,12 @@ These two pipelines function equivalently despite using different syntax. In thi
 + #           value: 80
 ```
 
-In the next lab, you'll learn how to override GitHub Actions Importer's default behavior and customize the converted workflow that is generated.
+In the next lab, you'll learn how to override GitHub Actions Importer's default
+behavior and customize the converted workflow that is generated.
 
-Try running the `dry-run` command for different pipelines in the Jenkins server. As a hint, you only have to change the `--source-url` CLI option.
+Try running the `dry-run` command for different pipelines in the Jenkins server.
+As a hint, you only have to change the `--source-url` CLI option.
 
 ## Next lab
 
-[Use custom transformers to customize GitHub Actions Importer's behavior](5-custom-transformers.md)
+[Customize GitHub Actions Importer's Behavior with Custom Transformers](5-custom-transformers.md)
