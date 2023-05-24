@@ -30,22 +30,24 @@ $ gh actions-importer migrate jenkins --target-url https://github.com/:owner/:re
 
 ## Step 2: Inspect the Pull Request
 
-1. Open the generated pull request in a new browser tab.
+1. Open the generated pull request in a new browser tab
 
-   The first thing we should notice about the pull request is that there is a
-   list of manual steps to complete:
+   The first thing you should notice about the pull request is that there is a
+   list of manual steps to complete.
 
    ![PR with manual steps](./images/pr.png)
 
-2. Click the "Files changed" tab
+2. Create the `SECRET_TEST_EXPRESSION_VAR` and mark it as complete in the PR
+
+3. Click the "Files changed" tab
 
    In this PR, you will see a new workflow being created,
    `.github/workflows/monas_freestyle.yml`. If you need to make changes,
    discuss, or get reviews, you can do so within this PR.
 
-3. Click the "Conversation" tab
-4. Click "Merge pull request"
+4. Click the "Conversation" tab
+5. Click "Merge pull request"
 
    Once the PR is merged, the new action will be available.
 
-5. Click the "Actions" tab to see the newly-created workflow
+6. Click the "Actions" tab to see the newly-created workflow
