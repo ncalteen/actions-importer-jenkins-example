@@ -17,7 +17,7 @@ When running a migration, the following inputs must be provided:
 2. Run the following command
 
    ```bash
-   gh actions-importer migrate jenkins --target-url https://github.com/ncalteen-migrations/actions-importer-lab --output-dir tmp/migrate --source-url http://localhost:8080/job/monas_dev_work/job/monas_freestyle
+   gh actions-importer migrate jenkins --target-url https://github.com/ncalteen-demos/github-actions-importer-jenkins --output-dir tmp/migrate --source-url http://localhost:8080/job/monas_dev_work/job/monas_freestyle
    ```
 
 The command will write the URL to the pull request that is created.
