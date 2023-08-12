@@ -2,17 +2,17 @@ name: monas_dev_work/monas_freestyle
 on:
   workflow_dispatch:
 env:
-  EXPRESSION_VAR: "${{ secrets.SECRET_TEST_EXPRESSION_VAR }}"
+  EXPRESSION_VAR: '${{ secrets.SECRET_TEST_EXPRESSION_VAR }}'
 jobs:
   build:
     runs-on:
       - ubuntu-latest
     steps:
-    - name: checkout
-      uses: actions/checkout@v3.5.0
-    - name: run command
-      shell: bash
-      run: |-
-        echo "This is from Monas freestyle pipline"
-        sleep 80
-        echo "Hope you are enjoying the lab!"
+      - name: checkout
+        uses: actions/checkout@v3.5.0
+      - name: run command
+        shell: bash
+        run: |-
+          echo "This is from Monas freestyle pipline"
+          sleep 80
+          echo "Hope you are enjoying the lab!"
